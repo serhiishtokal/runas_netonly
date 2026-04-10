@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  id-token: write
 
 jobs:
   build:
@@ -29,6 +30,12 @@ jobs:
       - name: Build standalone exe
         run: python build_exe.py
 
+      - name: Upload dist artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -36,3 +43,20 @@ jobs:
             dist/runas-netonly.exe
             dist/*.whl
           generate_release_notes: true
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+
+    steps:
+      - name: Download dist artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
