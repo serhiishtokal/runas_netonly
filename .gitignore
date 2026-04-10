@@ -3,3 +3,9 @@ __pycache__/
 /build/
 /dist/
 *.spec
+*.egg-info/
+*.whl
+*.tar.gz
+.eggs/
+venv/
+.venv/

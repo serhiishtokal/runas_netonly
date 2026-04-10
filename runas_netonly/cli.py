@@ -22,7 +22,7 @@ if sys.stdout is None:
 if sys.stderr is None:
     sys.stderr = open(os.devnull, "w")
 
-from winauth import (
+from .winauth import (
     STARTUPINFOW, PROCESS_INFORMATION,
     LOGON_NETCREDENTIALS_ONLY,
     CREATE_NEW_CONSOLE, CREATE_UNICODE_ENVIRONMENT,
