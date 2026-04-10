@@ -89,6 +89,10 @@ runas-netonly --domain CORP --user jsmith --exe "ipconfig /all" --pause
 python -m runas_netonly --domain CORP --user jsmith --exe "notepad.exe"
 ```
 
+## AI Agent Skill
+
+The `skill/` folder contains a portable agent skill file (`SKILL.md`) that teaches AI coding agents how to install and use this tool. Copy it into your project's skill/instructions directory to give your agent access to `runas-netonly`.
+
 ## Building the standalone .exe
 
 ```
