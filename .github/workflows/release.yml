@@ -27,14 +27,16 @@ jobs:
       - name: Build wheel and sdist
         run: python -m build
 
-      - name: Build standalone exe
-        run: python build_exe.py
-
-      - name: Upload dist artifacts
+      - name: Upload pypi artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: dist
-          path: dist/
+          name: pypi
+          path: |
+            dist/*.whl
+            dist/*.tar.gz
+
+      - name: Build standalone exe
+        run: python build_exe.py
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -52,10 +54,10 @@ jobs:
       id-token: write
 
     steps:
-      - name: Download dist artifacts
+      - name: Download pypi artifacts
         uses: actions/download-artifact@v4
         with:
-          name: dist
+          name: pypi
           path: dist/
 
       - name: Publish to PyPI

@@ -1,3 +1,3 @@
 """Launch Windows processes with /netonly domain authentication."""
 
-__version__ = "1.1.0"
+__version__ = "1.1.1"
