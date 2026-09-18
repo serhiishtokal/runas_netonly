@@ -71,6 +71,11 @@ runas-netonly --domain CORP --user jsmith --check --reveal
 runas-netonly --domain CORP --user jsmith --reset
 ```
 
+All credential fields support Ctrl+V (paste), Ctrl+A (select all), Ctrl+C,
+and Ctrl+X, including with Ukrainian and other non-Latin Windows keyboard
+layouts. You can also use Shift+Insert or right-click a field and choose
+**Paste**. Passwords remain masked.
+
 ### Delete stored credential
 
 ```
@@ -101,6 +106,26 @@ python build_exe.py
 ```
 
 Output: `dist/runas-netonly.exe`
+
+For a portable desktop shortcut without a console window:
+
+```
+python -m PyInstaller --onefile --windowed --name runas_netonly --hidden-import tkinter --collect-submodules runas_netonly runas_netonly/__main__.py
+```
+
+Output: `dist/runas_netonly.exe`
+
+## Tests
+
+Run on Windows with Python and Tkinter installed:
+
+```
+python -m unittest discover -s tests -v
+```
+
+The dialog tests exercise the installed keyboard layouts, including non-Latin
+layouts when available. They use test data without accessing the system clipboard
+or storing credentials.
 
 ## License
 

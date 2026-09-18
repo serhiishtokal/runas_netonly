@@ -189,6 +189,41 @@ def cred_delete(domain: str, user: str) -> bool:
 
 # ── GUI Credential Prompt ─────────────────────────────────────────────────────
 
+def _bind_entry_editing(entry) -> None:
+    """Keep Windows editing shortcuts working with non-Latin keyboard layouts."""
+    import tkinter as tk
+
+    shortcuts = {0x41: "<<SelectAll>>", 0x43: "<<Copy>>",
+                 0x56: "<<Paste>>", 0x58: "<<Cut>>"}
+
+    def on_control_key(event):
+        # AltGr includes Ctrl; leave Ctrl+Alt combinations to Tk.
+        if event.state & (0x0008 | 0x20000):
+            return None
+        # Tk 8.6 may report an unknown keysym for Cyrillic Ctrl+letter.
+        # Windows virtual-key codes still identify A/C/V/X correctly.
+        action = shortcuts.get(event.keycode)
+        if action:
+            entry.event_generate(action)
+            return "break"  # Do not also execute the default class binding.
+        return None
+
+    entry.bind("<Control-KeyPress>", on_control_key)
+    menu = tk.Menu(entry, tearoff=False)
+    menu.add_command(label="Paste", command=lambda: entry.event_generate("<<Paste>>"))
+    menu.add_command(label="Select all", command=lambda: entry.event_generate("<<SelectAll>>"))
+
+    def show_menu(event):
+        entry.focus_set()
+        try:
+            menu.tk_popup(event.x_root, event.y_root)
+        finally:
+            menu.grab_release()
+        return "break"
+
+    entry.bind("<Button-3>", show_menu)
+
+
 def ask_credentials_gui(
     default_domain: str,
     default_user: str,
@@ -219,16 +254,21 @@ def ask_credentials_gui(
 
     tk.Label(frame, text="Domain:", anchor="e").grid(row=1, column=0, sticky="e", pady=3)
     domain_var = tk.StringVar(value=default_domain)
-    tk.Entry(frame, textvariable=domain_var, width=30).grid(row=1, column=1, pady=3)
+    domain_entry = tk.Entry(frame, textvariable=domain_var, width=30)
+    domain_entry.grid(row=1, column=1, pady=3)
 
     tk.Label(frame, text="Username:", anchor="e").grid(row=2, column=0, sticky="e", pady=3)
     user_var = tk.StringVar(value=default_user)
-    tk.Entry(frame, textvariable=user_var, width=30).grid(row=2, column=1, pady=3)
+    user_entry = tk.Entry(frame, textvariable=user_var, width=30)
+    user_entry.grid(row=2, column=1, pady=3)
 
     tk.Label(frame, text="Password:", anchor="e").grid(row=3, column=0, sticky="e", pady=3)
     pass_entry = tk.Entry(frame, show="*", width=30)
     pass_entry.grid(row=3, column=1, pady=3)
     pass_entry.focus_set()
+
+    for entry in (domain_entry, user_entry, pass_entry):
+        _bind_entry_editing(entry)
 
     def on_ok(event=None):
         d = domain_var.get().strip()
